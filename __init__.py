@@ -1,7 +1,7 @@
 bl_info = {
     "name": "Tabs interface",
     "author": "Vilem Duha",
-    "version": (2, 0),
+    "version": (2, 0, 1),
     "blender": (4, 0, 0),
     "location": "Everywhere(almost)",
     "description": "Blender tabbed.",
@@ -16,14 +16,10 @@ import bpy_types
 import copy  # for deepcopy dicts
 import inspect
 import math
-import os
-import random
 import re
-import string
-import time
 from bpy.app.handlers import persistent
 
-from tabs_interface import panel_order
+from . import panel_order
 
 DEBUG = False
 
@@ -50,7 +46,7 @@ def yesPoll(cls, context):
 
 @classmethod
 def smartPoll(cls, context):
-    prefs = bpy.context.preferences.addons["tabs_interface"].preferences
+    prefs = bpy.context.preferences.addons[__package__].preferences
     polled = cls.opoll(context)
 
     if USE_DEFAULT_POLL:
@@ -436,7 +432,7 @@ def drawNone(self, context):
 
 
 def tabRow(layout):
-    prefs = bpy.context.preferences.addons["tabs_interface"].preferences
+    prefs = bpy.context.preferences.addons[__package__].preferences
     row = layout.row(align=prefs.fixed_width)  # not prefs.fixed_width)
     if not prefs.fixed_width:
         row.scale_y = prefs.scale_y
@@ -501,7 +497,7 @@ def drawTabsLayout(self, context, layout, tabpanel=None, operator_name='wm.activ
 
     # Fetch preferences and calculate initial layout dimensions
     ui_scale = context.preferences.view.ui_scale
-    prefs = bpy.context.preferences.addons["tabs_interface"].preferences
+    prefs = bpy.context.preferences.addons[__package__].preferences
     w = context.region.width  # width of the region
     margin = int(18 * ui_scale)
     if prefs.box:
@@ -732,7 +728,7 @@ def drawUpDown(self, context, tabID):
 
 
 def mySeparator(layout):
-    prefs = bpy.context.preferences.addons["tabs_interface"].preferences
+    prefs = bpy.context.preferences.addons[__package__].preferences
 
     if not prefs.box:
         layout.separator()
@@ -755,7 +751,7 @@ def drawFoldHeader(self, context, tabpanel_data):
 
 def drawTabs(self, context, plist, tabID):
     space = context.space_data.type
-    prefs = bpy.context.preferences.addons["tabs_interface"].preferences
+    prefs = bpy.context.preferences.addons[__package__].preferences
     s = bpy.context.window_manager
     # r = bpy.context.region
     if not hasattr(s, 'panelTabData'):
@@ -983,7 +979,7 @@ def drawTabs(self, context, plist, tabID):
 
 
 def modifiersDraw(self, context):
-    prefs = bpy.context.preferences.addons["tabs_interface"].preferences
+    prefs = bpy.context.preferences.addons[__package__].preferences
     ob = context.object
     layout = self.layout
     layout.operator_menu_enum("object.modifier_add", "type")
@@ -1029,7 +1025,7 @@ def modifiersDraw(self, context):
 
 
 def constraintsDraw(self, context):
-    prefs = bpy.context.preferences.addons["tabs_interface"].preferences
+    prefs = bpy.context.preferences.addons[__package__].preferences
 
     ob = context.object
 
@@ -1078,7 +1074,7 @@ def constraintsDraw(self, context):
 
 
 def boneConstraintsDraw(self, context):
-    prefs = bpy.context.preferences.addons["tabs_interface"].preferences
+    prefs = bpy.context.preferences.addons[__package__].preferences
 
     pb = context.pose_bone
     layout = self.layout
@@ -1288,7 +1284,7 @@ def getFilteredTabs(self, context):
 
 
 def drawRegionUI(self, context):  # , getspace, getregion, tabID):
-    prefs = bpy.context.preferences.addons["tabs_interface"].preferences
+    prefs = bpy.context.preferences.addons[__package__].preferences
     # print(dir(self))
 
     tabID = self.bl_idname
@@ -1500,7 +1496,7 @@ class ActivatePanel(bpy.types.Operator):
                                   default=False)
 
     def execute(self, context):
-        prefs = bpy.context.preferences.addons["tabs_interface"].preferences
+        prefs = bpy.context.preferences.addons[__package__].preferences
         tabpanel = getattr(bpy.types, self.tabpanel_id, None)
         s = bpy.context.window_manager
         s.panelTabData[self.tabpanel_id].active_tab = self.panel_id
@@ -1577,7 +1573,7 @@ class ActivateCategory(bpy.types.Operator):
                                   default=False)
 
     def execute(self, context):
-        prefs = bpy.context.preferences.addons["tabs_interface"].preferences
+        prefs = bpy.context.preferences.addons[__package__].preferences
         # unhide_panel(self.tabpanel_id)
         tabpanel = getattr(bpy.types, self.tabpanel_id)
         s = bpy.context.window_manager
@@ -1586,7 +1582,7 @@ class ActivateCategory(bpy.types.Operator):
         return {'FINISHED'}
 
     def invoke(self, context, event):
-        prefs = bpy.context.preferences.addons["tabs_interface"].preferences
+        prefs = bpy.context.preferences.addons[__package__].preferences
         if event.shift:  # for Multi-selection self.obj = context.selected_objects
             self.shift = True
             # print('shift')
@@ -1753,7 +1749,7 @@ class ActivatePoseBoneConstraint(bpy.types.Operator):
 class TabsPanel:
     @classmethod
     def poll(cls, context):
-        prefs = bpy.context.preferences.addons["tabs_interface"].preferences
+        prefs = bpy.context.preferences.addons[__package__].preferences
         if prefs.enable_disabling:
             if prefs.disable_PROPERTIES and context.area.type == 'PROPERTIES':
                 return False
@@ -1879,7 +1875,7 @@ class VIEW3D_PT_Transform(bpy.types.Panel):
 
 
 def updateDisabling(self, context):
-    prefs = bpy.context.preferences.addons["tabs_interface"].preferences
+    prefs = bpy.context.preferences.addons[__package__].preferences
     s = bpy.context.window_manager
     spaces = s.panelSpaces
     panel_data = s.panelData

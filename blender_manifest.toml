@@ -1,0 +1,14 @@
+schema_version = "1.0.0"
+id = "tabs_interface"
+name = "Tabs interface"
+version = "2.0.1"
+tagline = "Blender tabbed"
+maintainer = "Vilem Duha, BlenderKit <admin@blenderkit.com>"
+type = "add-on"
+tags = ["User Interface"]
+blender_version_min = "4.2.0"
+license = ["SPDX:"]
+website = "https://github.com/BlenderKit/tabs_interface"
+copyright = [
+    "2024 Vilem Duha",
+]
